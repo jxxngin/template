@@ -6,8 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/posts")
@@ -33,7 +36,16 @@ public class PostController {
 
     @PostMapping("/write")
     @ResponseBody
-    public String doWrite(@ModelAttribute @Valid WriteForm form) {
+    public String doWrite(@Valid WriteForm form, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            String errorMsg = bindingResult.getFieldErrors()
+                    .stream()
+                    .map(err -> err.getDefaultMessage())
+                    .collect(Collectors.joining("<br>"));
+
+            return getFormHtml(errorMsg);
+        }
+
         return """
                 <h1>게시물 조회</h1>
                 <div>%s</div>
@@ -43,12 +55,12 @@ public class PostController {
 
     private String getFormHtml(String msg) {
         return """
-                    <div>%s</div>
-                    <form method="post">
-                      <input type="text" name="title" placeholder="제목" /> <br>
-                      <textarea name="content"></textarea> <br>
-                      <input type="submit" value="등록" /> <br>
-                    </form>
-                    """.formatted(msg);
+               <div>%s</div>
+               <form method="post">
+                 <input type="text" name="title" placeholder="제목" /> <br>
+                 <textarea name="content"></textarea> <br>
+                 <input type="submit" value="등록" /> <br>
+               </form>
+               """.formatted(msg);
     }
 }
