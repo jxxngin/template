@@ -7,7 +7,6 @@ import lombok.Getter;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.stream.Collectors;
@@ -19,7 +18,7 @@ public class PostController {
     @GetMapping("/write")
     @ResponseBody
     public String showWrite() {
-        return getFormHtml("");
+        return getFormHtml("", "", "");
     }
 
     @AllArgsConstructor
@@ -45,7 +44,7 @@ public class PostController {
                     .map(msg -> msg.split("-")[1])
                     .collect(Collectors.joining("<br>"));
 
-            return getFormHtml(errorMsg);
+            return getFormHtml(errorMsg, form.getTitle(), form.getContent());
         }
 
         return """
@@ -55,14 +54,14 @@ public class PostController {
                 """.formatted(form.getTitle(), form.getContent());
     }
 
-    private String getFormHtml(String msg) {
+    private String getFormHtml(String errorMsg, String title, String content) {
         return """
                <div>%s</div>
-               <form method="post">
-                 <input type="text" name="title" placeholder="제목" /> <br>
-                 <textarea name="content"></textarea> <br>
-                 <input type="submit" value="등록" /> <br>
-               </form>
-               """.formatted(msg);
+                <form method="post">
+                  <input type="text" name="title" placeholder="제목" value="%s"/> <br>
+                  <textarea name="content">%s</textarea> <br>
+                  <input type="submit" value="등록" /> <br>
+                </form>
+               """.formatted(errorMsg, title, content);
     }
 }
