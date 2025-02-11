@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,14 +64,20 @@ public class PostController {
     }
 
     @PostMapping("/write")
-    public String doWrite(@Valid WriteForm form, BindingResult bindingResult) {
+    public String doWrite(
+            @Valid WriteForm form,
+            BindingResult bindingResult,
+            Model model
+    ) {
         if (bindingResult.hasErrors()) {
-            String errorMsg = bindingResult.getFieldErrors()
+            String errorMessage = bindingResult.getFieldErrors()
                     .stream()
                     .map(err -> err.getDefaultMessage())
                     .sorted()
                     .map(msg -> msg.split("-")[1])
                     .collect(Collectors.joining("<br>"));
+
+            model.addAttribute("errorMessage", errorMessage);
 
             return "domain/post/post/write";
         }
