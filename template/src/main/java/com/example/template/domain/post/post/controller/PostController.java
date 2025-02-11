@@ -63,7 +63,6 @@ public class PostController {
     }
 
     @PostMapping("/write")
-    @ResponseBody
     public String doWrite(@Valid WriteForm form, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String errorMsg = bindingResult.getFieldErrors()
